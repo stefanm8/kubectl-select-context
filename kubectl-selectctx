@@ -2,7 +2,7 @@
 import subprocess
 
 
-def color(text, name: str):
+def color(text, name):
     end = '\033[0m'
     clr = dict(
         HEADER = '\033[95m',
@@ -21,13 +21,13 @@ def cmd(cmd, *args):
     return [item for item in out if item]
 
 def prompt(content):
-    print(color(color("   {}".format(content.pop(0)), "underline"), "okblue"))
+    print(color(color("   {}".format(content.pop(0)), "bold"), "okblue"))
     for index, item in enumerate(content):
         print(color("{}. {}".format(index, item), "okblue"))
         
     def choice():
-        print()
-        val = input(color("Select option (only numbers): ", "bold"))
+        print('')
+        val = str(input(color("Select option (only numbers): ", "bold")))
         if val.isdigit() and int(val) < len(content):
             return int(val)
         return choice()
