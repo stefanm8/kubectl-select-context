@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/local/bin/python3
 import subprocess
 
 
@@ -38,7 +38,12 @@ def prompt(content):
 
 def main():
     contexts = cmd("config get-contexts")
-    curr, name, cluster, authinfo, namespace = prompt(contexts)
+    ch = tuple(prompt(contexts))
+    if len(ch) == 4:
+        name = ch[0]
+    else:
+        name = ch[1]
+
     out = cmd("config use-context {}".format(name))
     print(color("\n".join(out), "okgreen"))
 
