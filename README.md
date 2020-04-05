@@ -1,18 +1,16 @@
-
-
-# kubectl-selectctx
-is a small plugin that prompts user to select config context
+# kubectl-context
+is a small plugin to interact with context
 
 
 ## Installation
 
 1. Clone the repo
-2. `sudo chmod +x kubectl-selectctx`
-3. ln kubectl-selectctx /usr/local/bin
+2. `sudo chmod +x kubectl-context`
+3. ln kubectl-context /usr/local/bin
 
 
 ## Usage
 
 `
-kubectl selectctx
+kubectl context
 `

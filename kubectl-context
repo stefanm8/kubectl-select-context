@@ -1,0 +1,79 @@
+#!/usr/local/bin/python3
+import subprocess
+import argparse
+import sys
+
+def color(text, name):
+    end = '\033[0m'
+    clr = dict(
+        HEADER = '\033[95m',
+        OKBLUE = '\033[36m',
+        OKGREEN = '\033[92m',
+        WARNING = '\033[93m',
+        FAIL = '\033[91m',
+        BOLD = '\033[1m',
+        UNDERLINE = '\033[4m',
+        CYAN = "\033[44m",
+        REVERSED = "\033[7m",
+    )[name.upper()]
+    return f"{clr}{text}{end}"
+
+def cmd(cmd, *args):
+    cmd = f"kubectl {cmd.format(*args)}"
+    out = subprocess.check_output(cmd, shell=True).decode("utf-8").split("\n")
+    return [item for item in out if item]
+
+def display(content, prompt=False):
+    print(f"{content.pop(0)}")
+    for index, item in enumerate(content):
+        index += 1
+        if "*" in item:
+            if prompt:
+                print(color(f"{index}. {item}", "warning"))
+            else:
+                print(color(item, "warning"))
+            continue
+        if prompt:
+            print(f"{index}. {item}")
+        else:
+            print(item)
+
+def search_context(contexts, needle):
+    if needle.isdigit() and int(needle) > 0:
+        needle = int(needle)
+        if needle >= len(contexts):
+            return None
+        return contexts[int(needle)].replace("*", '')
+    ctx = list(filter(lambda x: needle in x, contexts))
+    if len(ctx) < 1:
+        return None
+    return ctx[0].replace("*", '')
+
+def main(args, contexts):
+    try:
+        ctx = search_context(contexts, args.ctx)
+        if ctx is None:
+            print("context was not found")
+            sys.exit(1)
+        out = cmd(f"config use-context {ctx.split()[0]}")
+        print(color("\n".join(out), "okgreen"))
+    except subprocess.CalledProcessError as e:
+        pass
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser("Select Context")
+    parser.add_argument("ctx", help="context to switch", nargs="*")
+
+    contexts = cmd("config get-contexts")
+    args = parser.parse_args()
+
+    if len(sys.argv) < 2:
+        display(contexts)
+        sys.exit(0)
+
+    if len(args.ctx) > 0:
+        args.ctx = args.ctx[0]
+    try:
+        main(args, contexts)
+    except KeyboardInterrupt:
+        pass
